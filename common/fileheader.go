@@ -3,6 +3,7 @@ package common
 import (
 	"encoding/binary"
 	"fmt"
+	"golang.org/x/xerrors"
 	"io"
 )
 
@@ -69,7 +70,7 @@ func ReadHeaders(r io.ReadSeeker) error {
 	var hdr1 ShapeFileHeader1
 	err := binary.Read(r, binary.BigEndian, &hdr1)
 	if err != nil {
-		return err
+		return xerrors.Errorf(`error reading first header (BE) part: %w`, err)
 	}
 
 	err = hdr1.Validate()
@@ -77,10 +78,11 @@ func ReadHeaders(r io.ReadSeeker) error {
 		return err
 	}
 
+	// Read secondary header (notice endianness!)
 	var hdr2 ShapeFileHeader2
 	err = binary.Read(r, binary.LittleEndian, &hdr2)
 	if err != nil {
-		return err
+		return xerrors.Errorf(`error reading second header (LE) part: %w`, err)
 	}
 
 	offset, err := r.Seek(0, io.SeekCurrent)
