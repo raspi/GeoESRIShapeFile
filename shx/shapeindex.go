@@ -94,7 +94,7 @@ func (sfi *ShapeFileIndex) ReadRecord() (o ShapeOffsetIndex, err error) {
 	o.Length *= 2
 
 	sfi.totalFileSize += uint(o.Length)
-	sfi.totalFileSize += 8
+	sfi.totalFileSize += 8 // Meta data
 	sfi.totalRecords++
 
 	return o, nil
