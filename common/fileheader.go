@@ -21,13 +21,12 @@ Byte 20 Unused       0           Integer Big
 Byte 24 File Length  File Length Integer Big
 */
 type ShapeFileHeader1 struct {
-	FileCode int32     // 9994
+	FileCode uint32    // 9994
 	Unused   [5]uint32 // all 0
 	Length   uint32
 }
 
 func (header1 ShapeFileHeader1) Validate() error {
-
 	if header1.FileCode != 9994 {
 		return fmt.Errorf(`filecode was not 9994`)
 	}
