@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"golang.org/x/xerrors"
 	"io"
+	"math"
 )
 
 const (
@@ -130,6 +131,7 @@ func ReadHeaders(r ReadSeekCloser) (err error) {
 // Read primary header (notice endianness!)
 func readFirstHeader(r ReadSeekCloser) error {
 	var hdr1 ShapeFileHeader1
+	hdr1.Unused[1] = math.MaxInt32 // to detect possible corruption
 	err := binary.Read(r, binary.BigEndian, &hdr1)
 	if err != nil {
 		return err
