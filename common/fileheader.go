@@ -66,22 +66,13 @@ type ShapeFileHeader2 struct {
 }
 
 //Read headers shared by .shp and .shx file
-func ReadHeaders(r ReadSeekCloser) error {
-	// Read primary header (notice endianness!)
-	var hdr1 ShapeFileHeader1
-	err := binary.Read(r, binary.BigEndian, &hdr1)
+func ReadHeaders(r ReadSeekCloser) (err error) {
+	err = readFirstHeader(r)
 	if err != nil {
 		return xerrors.Errorf(`error reading first header (BE) part: %w`, err)
 	}
 
-	err = hdr1.Validate()
-	if err != nil {
-		return err
-	}
-
-	// Read secondary header (notice endianness!)
-	var hdr2 ShapeFileHeader2
-	err = binary.Read(r, binary.LittleEndian, &hdr2)
+	err = readSecondHeader(r)
 	if err != nil {
 		return xerrors.Errorf(`error reading second header (LE) part: %w`, err)
 	}
@@ -93,6 +84,33 @@ func ReadHeaders(r ReadSeekCloser) error {
 
 	if offset != 100 {
 		return fmt.Errorf(`offset is not 100`)
+	}
+
+	return nil
+}
+
+// Read primary header (notice endianness!)
+func readFirstHeader(r ReadSeekCloser) error {
+	var hdr1 ShapeFileHeader1
+	err := binary.Read(r, binary.BigEndian, &hdr1)
+	if err != nil {
+		return err
+	}
+
+	err = hdr1.Validate()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Read secondary header (notice endianness!)
+func readSecondHeader(r ReadSeekCloser) error {
+	var hdr2 ShapeFileHeader2
+	err := binary.Read(r, binary.LittleEndian, &hdr2)
+	if err != nil {
+		return err
 	}
 
 	return nil
