@@ -41,6 +41,10 @@ func (h ShapeFileHeader1) Validate() error {
 		}
 	}
 
+	if h.Length == 0 {
+		return &InvalidHeaderLength{Value: h.Length}
+	}
+
 	return nil
 }
 

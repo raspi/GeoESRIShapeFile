@@ -24,6 +24,14 @@ func (e *InvalidHeaderUnused) Error() string {
 	return fmt.Sprintf(`invalid unused %v at index: %d`, e.Value, e.Index)
 }
 
+type InvalidHeaderLength struct {
+	Value uint32
+}
+
+func (e *InvalidHeaderLength) Error() string {
+	return fmt.Sprintf(`invalid length: %d`, e.Value)
+}
+
 type InvalidHeaderVersion struct {
 	Version uint32
 }
