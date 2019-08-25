@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+const (
+	TerminatorCharacter = 0x0d
+)
+
 // raw dBase header
 // size: 32 bytes
 // count: 1
@@ -106,7 +110,7 @@ func (db *DBaseFile) readTerminator() (err error) {
 		return err
 	}
 
-	if terminator[0] != 0x0d {
+	if terminator[0] != TerminatorCharacter {
 		return fmt.Errorf(`invalid terminator: %#v`, terminator)
 	}
 
