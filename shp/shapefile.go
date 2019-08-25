@@ -55,7 +55,6 @@ func (sf *ShapeFile) ReadRecord() (idx uint32, record ShapeTypeI, err error) {
 	}
 
 	var rechdr RecordHeader
-
 	err = binary.Read(sf.r, binary.BigEndian, &rechdr)
 	if err != nil {
 		return 0, nil, err
