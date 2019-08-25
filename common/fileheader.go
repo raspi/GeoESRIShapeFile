@@ -66,7 +66,8 @@ type ShapeFileHeader2 struct {
 	BBoxMMax  float64
 }
 
-func ReadHeaders(r io.ReadSeeker) error {
+func ReadHeaders(r ReadSeekCloser) error {
+	// Read primary header (notice endianness!)
 	var hdr1 ShapeFileHeader1
 	err := binary.Read(r, binary.BigEndian, &hdr1)
 	if err != nil {
