@@ -25,21 +25,19 @@ func (db *DBaseFile) ReadRecord() (m map[string]Record, err error) {
 
 	m = make(map[string]Record, db.Header.FieldCount)
 
-	recordSizeLen := db.Header.RecordSize
-
-	rawalldata := make([]byte, recordSizeLen)
+	rawalldata := make([]byte, db.Header.RecordSize)
 	rBytesAll, err := db.r.Read(rawalldata)
 	if err != nil {
 		return nil, err
 	}
 
-	if rBytesAll != recordSizeLen {
+	if rBytesAll != db.Header.RecordSize {
 		if rBytesAll == 1 && rawalldata[0] == 0x1a {
 			// We are at the end
 			return nil, io.EOF
 		}
 
-		return nil, fmt.Errorf("full record size mismatch header is %v, had %v:\n%#v", recordSizeLen, rBytesAll, rawalldata[:rBytesAll])
+		return nil, fmt.Errorf("full record size mismatch header is %v, had %v:\n%#v", db.Header.RecordSize, rBytesAll, rawalldata[:rBytesAll])
 	}
 
 	r := bytes.NewReader(rawalldata)
