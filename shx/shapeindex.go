@@ -5,49 +5,97 @@ import (
 	"fmt"
 	"github.com/raspi/GeoESRIShapeFile/common"
 	"io"
+	"log"
 )
+
+type ShapeFileIndex struct {
+	r             common.ReadSeekCloser
+	debug         bool
+	initialized   bool
+	totalFileSize uint
+	totalRecords  uint
+}
 
 // Offsets for .shp file
 type ShapeOffsetIndex struct {
-	Offset uint32
-	Length uint32
+	Offset uint32 // record offset
+	Length uint32 // record length
 }
 
 func (oi ShapeOffsetIndex) String() string {
 	return fmt.Sprintf(`offset 0x%04[1]x (%06[1]d) with len 0x%04[2]x (%06[2]d)`, oi.Offset, oi.Length)
 }
 
-func New(fname string) (offsets []ShapeOffsetIndex, shpTotalFilesize int64, err error) {
+func New(fname string) (sfi ShapeFileIndex, err error) {
 	f, err := common.OpenFile(fname)
 	if err != nil {
-		return nil, 0, err
+		return sfi, err
 	}
-	defer f.Close()
 
-	err = common.ReadHeaders(f)
+	return ShapeFileIndex{
+		r:           f,
+		debug:       false,
+		initialized: false,
+	}, nil
+}
+
+func (sfi *ShapeFileIndex) SetDebug(flag bool) {
+	sfi.debug = flag
+}
+
+func (sfi *ShapeFileIndex) GetDebug() bool {
+	return sfi.debug
+}
+
+func (sfi *ShapeFileIndex) Close() error {
+	return sfi.r.Close()
+}
+
+func (sfi *ShapeFileIndex) Initialize() (err error) {
+	err = common.ReadHeaders(sfi.r)
 	if err != nil {
-		return nil, 0, err
+		return err
 	}
 
-	totalLen := int64(100) // header = 100
-
-	for {
-		var o ShapeOffsetIndex
-		err = binary.Read(f, binary.BigEndian, &o)
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			return offsets, totalLen, err
-		}
-
-		o.Offset *= 2
-		o.Length *= 2
-
-		totalLen += int64(o.Length) + 8 // metadata
-		offsets = append(offsets, o)
+	offset, err := sfi.r.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return err
 	}
 
-	return offsets, totalLen, nil
+	sfi.totalFileSize += uint(offset)
+
+	if sfi.debug {
+		log.Printf(`header read successfully`)
+	}
+
+	sfi.initialized = true
+	return nil
+}
+
+func (sfi ShapeFileIndex) GetShapeFileSize() uint {
+	return sfi.totalFileSize
+}
+
+func (sfi ShapeFileIndex) GetRecordCount() uint {
+	return sfi.totalRecords
+}
+
+func (sfi *ShapeFileIndex) ReadRecord() (o ShapeOffsetIndex, err error) {
+	if !sfi.initialized {
+		return o, common.ErrorNotInitialized
+	}
+
+	err = binary.Read(sfi.r, binary.BigEndian, &o)
+	if err != nil {
+		return o, err
+	}
+
+	o.Offset *= 2
+	o.Length *= 2
+
+	sfi.totalFileSize += uint(o.Length)
+	sfi.totalFileSize += 8
+	sfi.totalRecords++
+
+	return o, nil
 }
