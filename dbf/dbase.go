@@ -5,6 +5,7 @@ import (
 	"github.com/raspi/GeoESRIShapeFile/common"
 	"golang.org/x/xerrors"
 	"io"
+	"log"
 )
 
 type Operation uint8
@@ -60,26 +61,36 @@ func New(fname string, parseFieldNames []string, parseFieldNamesOperation Operat
 		initialized:                  false,
 	}
 
+	return db, nil
+}
+
+func (db *DBaseFile) Initialize() (err error) {
 	err = db.readHeader()
 	if err != nil {
-		return db, xerrors.Errorf(`error reading header: %w`, err)
+		return xerrors.Errorf(`error reading header: %w`, err)
 	}
 
 	err = db.readFieldHeaders()
 	if err != nil {
-		return db, xerrors.Errorf(`error reading field(s): %w`, err)
+		return xerrors.Errorf(`error reading field(s): %w`, err)
 	}
 
 	err = db.readTerminator()
 	if err != nil {
-		return db, xerrors.Errorf(`error reading terminator character after field(s): %w`, err)
+		return xerrors.Errorf(`error reading terminator character after field(s): %w`, err)
 	}
 
 	if len(db.FieldDescriptors) != db.Header.FieldCount {
-		return db, fmt.Errorf(`fields found %v but should be %v`, len(db.FieldDescriptors), db.Header.FieldCount)
+		return fmt.Errorf(`fields found %v but should be %v`, len(db.FieldDescriptors), db.Header.FieldCount)
 	}
 
-	return db, nil
+	if db.debug {
+		log.Printf(`header read successfully`)
+	}
+
+	db.initialized = true
+
+	return nil
 }
 
 func (db *DBaseFile) checkOffset(expected int64, estr string) error {

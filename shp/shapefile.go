@@ -24,6 +24,14 @@ func (sf ShapeFile) Close() error {
 	return sf.r.Close()
 }
 
+func (sf *ShapeFile) SetDebug(flag bool) {
+	sf.debug = flag
+}
+
+func (sf *ShapeFile) GetDebug() bool {
+	return sf.debug
+}
+
 func (sf *ShapeFile) ReadRecordAt(offset int64) (idx uint32, record ShapeTypeI, err error) {
 	_, err = sf.r.Seek(offset, io.SeekStart)
 	if err != nil {
