@@ -7,6 +7,10 @@ import (
 )
 
 /*
+Headers shared by .shp and .shx
+*/
+
+/*
 Byte 0  File    Code 9994 Integer Big
 Byte 4  Unused0 Integer Big
 Byte 8  Unused0 Integer Big
