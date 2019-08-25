@@ -94,3 +94,11 @@ func (db *DBaseFile) checkOffset(expected int64, estr string) error {
 
 	return nil
 }
+
+func (db *DBaseFile) SetDebug(flag bool) {
+	db.debug = flag
+}
+
+func (db *DBaseFile) GetDebug() bool {
+	return db.debug
+}
