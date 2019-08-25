@@ -43,7 +43,7 @@ func (sf *ShapeFile) ReadRecordAt(offset int64) (idx uint32, record ShapeTypeI, 
 
 func (sf *ShapeFile) ReadRecord() (idx uint32, record ShapeTypeI, err error) {
 	if !sf.initialized {
-		return idx, record, common.ErrorNotInitialized
+		return idx, nil, common.ErrorNotInitialized
 	}
 
 	offset := int64(-1)
