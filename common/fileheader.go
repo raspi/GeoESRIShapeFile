@@ -90,8 +90,6 @@ func (h ShapeFileHeader2) Validate() error {
 		return &ErrInvalidShapeType{ShapeType: h.ShapeType}
 	}
 
-	panic(h.ShapeType)
-
 	return nil
 }
 
