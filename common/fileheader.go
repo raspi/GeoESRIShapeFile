@@ -12,13 +12,13 @@ Headers shared by .shp and .shx
 */
 
 /*
-Byte 0  File    Code 9994 Integer Big
-Byte 4  Unused0 Integer Big
-Byte 8  Unused0 Integer Big
-Byte 12 Unused0 Integer Big
-Byte 16 Unused0 Integer Big
-Byte 20 Unused0 Integer Big
-Byte 24 File    Length File Length Integer Big
+Byte 0  File Code    9994        Integer Big
+Byte 4  Unused       0           Integer Big
+Byte 8  Unused       0           Integer Big
+Byte 12 Unused       0           Integer Big
+Byte 16 Unused       0           Integer Big
+Byte 20 Unused       0           Integer Big
+Byte 24 File Length  File Length Integer Big
 */
 type ShapeFileHeader1 struct {
 	FileCode int32     // 9994
@@ -42,16 +42,16 @@ func (header1 ShapeFileHeader1) Validate() error {
 }
 
 /*
-Byte 28 Version 1000 Integer Little
-Byte 32 Shape Type Shape Type Integer Little
-Byte 36 Bounding Box Xmin Double Little
-Byte 44 Bounding Box Ymin Double Little
-Byte 52 Bounding Box Xmax Double Little
-Byte 60 Bounding Box Ymax Double Little
-Byte 68* Bounding Box Zmin Double Little
-Byte 76* Bounding Box Zmax Double Little
-Byte 84* Bounding Box Mmin Double Little
-Byte 92* Bounding Box Mmax Double Little
+Byte 28  Version  1000            Integer Little
+Byte 32  Shape    Type Shape Type Integer Little
+Byte 36  Bounding Box Xmin        Double  Little
+Byte 44  Bounding Box Ymin        Double  Little
+Byte 52  Bounding Box Xmax        Double  Little
+Byte 60  Bounding Box Ymax        Double  Little
+Byte 68* Bounding Box Zmin        Double  Little
+Byte 76* Bounding Box Zmax        Double  Little
+Byte 84* Bounding Box Mmin        Double  Little
+Byte 92* Bounding Box Mmax        Double  Little
 */
 type ShapeFileHeader2 struct {
 	Version   uint32
