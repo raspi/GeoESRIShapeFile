@@ -10,6 +10,13 @@ import (
 
 var ErrorDeletedRecord = errors.New("deleted record")
 
+type RecordFirstCharacter byte
+
+const (
+	DeletedRecord RecordFirstCharacter = 0x2a
+	OkRecord      RecordFirstCharacter = 0x20
+)
+
 type Record struct {
 	Value interface{}
 }
@@ -47,12 +54,12 @@ func (db *DBaseFile) ReadRecord() (m map[string]Record, err error) {
 		return nil, err
 	}
 
-	switch first {
+	switch RecordFirstCharacter(first) {
 	default:
 		return nil, fmt.Errorf(`weird first byte: %[1]d %[1]c %[1]v`, first)
-	case 0x2a: // deleted record
+	case DeletedRecord: // deleted record
 		return nil, ErrorDeletedRecord
-	case 0x20: // ok
+	case OkRecord: // ok
 	}
 
 	for _, f := range db.FieldDescriptors {
