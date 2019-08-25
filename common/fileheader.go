@@ -7,6 +7,12 @@ import (
 	"io"
 )
 
+const (
+	HeaderFileCode         = 9994
+	HeaderUnusedMustBe     = 0
+	SecondaryHeaderVersion = 1000
+)
+
 /*
 Headers shared by .shp and .shx
 */
@@ -31,12 +37,12 @@ func (h ShapeFileHeader1) String() string {
 }
 
 func (h ShapeFileHeader1) Validate() error {
-	if h.FileCode != 9994 {
+	if h.FileCode != HeaderFileCode {
 		return &InvalidFileCode{Code: h.FileCode}
 	}
 
 	for idx, uu := range h.Unused {
-		if uu != 0 {
+		if uu != HeaderUnusedMustBe {
 			return &InvalidHeaderUnused{Index: idx, Value: uu}
 		}
 	}
@@ -86,7 +92,7 @@ func (h ShapeFileHeader2) String() string {
 }
 
 func (h ShapeFileHeader2) Validate() error {
-	if h.Version != 1000 {
+	if h.Version != SecondaryHeaderVersion {
 		return &InvalidHeaderVersion{Version: h.Version}
 	}
 
