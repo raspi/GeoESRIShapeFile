@@ -26,14 +26,18 @@ type ShapeFileHeader1 struct {
 	Length   uint32
 }
 
-func (header1 ShapeFileHeader1) Validate() error {
-	if header1.FileCode != 9994 {
-		return fmt.Errorf(`filecode was not 9994`)
+func (h ShapeFileHeader1) String() string {
+	return fmt.Sprintf(`code:%d len:%d %#v`, h.FileCode, h.Length, h.Unused)
+}
+
+func (h ShapeFileHeader1) Validate() error {
+	if h.FileCode != 9994 {
+		return &InvalidFileCode{Code: h.FileCode}
 	}
 
-	for _, uu := range header1.Unused {
+	for idx, uu := range h.Unused {
 		if uu != 0 {
-			return fmt.Errorf(`unused was not 0`)
+			return &InvalidHeaderUnused{Index: idx, Value: uu}
 		}
 	}
 
@@ -55,14 +59,40 @@ Byte 92* Bounding Box Mmax        Double  Little
 type ShapeFileHeader2 struct {
 	Version   uint32
 	ShapeType ShapeType
-	BBoxXMin  float64
-	BBoxYMin  float64
-	BBoxXMax  float64
-	BBoxYMax  float64
-	BBoxZMin  float64
-	BBoxZMax  float64
-	BBoxMMin  float64
-	BBoxMMax  float64
+
+	Min struct {
+		X, Y float64
+	}
+
+	Max struct {
+		X, Y float64
+	}
+
+	Z struct {
+		Min, Max float64
+	}
+
+	M struct {
+		Min, Max float64
+	}
+}
+
+func (h ShapeFileHeader2) String() string {
+	return fmt.Sprintf(`ver:%d t:%v min:%#v max:%#v Z:%#v M:%#v`, h.Version, h.ShapeType, h.Min, h.Max, h.Z, h.M)
+}
+
+func (h ShapeFileHeader2) Validate() error {
+	if h.Version != 1000 {
+		return &InvalidHeaderVersion{Version: h.Version}
+	}
+
+	if !IsSupportedShapeType(h.ShapeType) {
+		return &ErrInvalidShapeType{ShapeType: h.ShapeType}
+	}
+
+	panic(h.ShapeType)
+
+	return nil
 }
 
 //Read headers shared by .shp and .shx file
@@ -109,6 +139,11 @@ func readFirstHeader(r ReadSeekCloser) error {
 func readSecondHeader(r ReadSeekCloser) error {
 	var hdr2 ShapeFileHeader2
 	err := binary.Read(r, binary.LittleEndian, &hdr2)
+	if err != nil {
+		return err
+	}
+
+	err = hdr2.Validate()
 	if err != nil {
 		return err
 	}

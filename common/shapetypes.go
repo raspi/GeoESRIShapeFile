@@ -54,5 +54,13 @@ func (st ShapeType) String() string {
 	default:
 		return fmt.Sprintf("Unsupported shape type: %d", st)
 	}
+}
 
+func IsSupportedShapeType(st ShapeType) bool {
+	switch st {
+	case NULL, POINT, POLYLINE, POLYGON, MULTIPOINT, POINTZ, POLYLINEZ, POLYGONZ, MULTIPOINTZ, POINTM, POLYLINEM, POLYGONM, MULTIPOINTM, MULTIPATCH:
+		return true
+	default:
+		return false
+	}
 }
