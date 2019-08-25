@@ -21,6 +21,7 @@ type DBaseFile struct {
 	converterFunctions           map[string]ConverterFunction
 	r                            common.ReadSeekCloser
 	debug                        bool
+	initialized                  bool
 	useDefaultConverterIfMissing bool
 	defaultConverter             ConverterFunction
 	parseFieldNames              []string
@@ -56,6 +57,7 @@ func New(fname string, parseFieldNames []string, parseFieldNamesOperation Operat
 		defaultConverter:             defaultConverter,
 		parseFieldNames:              parseFieldNames,
 		parseFieldNamesOperation:     parseFieldNamesOperation,
+		initialized:                  false,
 	}
 
 	err = db.readHeader()

@@ -15,8 +15,9 @@ type RecordHeader struct {
 }
 
 type ShapeFile struct {
-	r     common.ReadSeekCloser
-	debug bool
+	r           common.ReadSeekCloser
+	debug       bool
+	initialized bool
 }
 
 func (sf ShapeFile) Close() error {
@@ -104,12 +105,8 @@ func New(fname string) (sf ShapeFile, err error) {
 		return sf, err
 	}
 
-	err = common.ReadHeaders(f)
-	if err != nil {
-		return sf, nil
-	}
-
 	return ShapeFile{
-		r: f,
+		r:           f,
+		initialized: false,
 	}, nil
 }

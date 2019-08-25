@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/raspi/GeoESRIShapeFile/common"
 	"io"
 )
 
@@ -18,6 +19,10 @@ func (r Record) String() string {
 }
 
 func (db *DBaseFile) ReadRecord() (m map[string]Record, err error) {
+	if !db.initialized {
+		return nil, common.ErrorNotInitialized
+	}
+
 	m = make(map[string]Record, len(db.FieldDescriptors))
 
 	recordSizeLen := db.Header.RecordSize
