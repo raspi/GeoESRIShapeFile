@@ -20,7 +20,7 @@ type ShapeFile struct {
 	initialized bool
 }
 
-func (sf ShapeFile) Close() error {
+func (sf *ShapeFile) Close() error {
 	return sf.r.Close()
 }
 
@@ -42,6 +42,10 @@ func (sf *ShapeFile) ReadRecordAt(offset int64) (idx uint32, record ShapeTypeI, 
 }
 
 func (sf *ShapeFile) ReadRecord() (idx uint32, record ShapeTypeI, err error) {
+	if !sf.initialized {
+		return idx, record, common.ErrorNotInitialized
+	}
+
 	offset := int64(-1)
 	if sf.debug {
 		offset, err = sf.r.Seek(0, io.SeekCurrent)
@@ -117,4 +121,19 @@ func New(fname string) (sf ShapeFile, err error) {
 		r:           f,
 		initialized: false,
 	}, nil
+}
+
+func (sf *ShapeFile) Initialize() (err error) {
+	err = common.ReadHeaders(sf.r)
+	if err != nil {
+		return err
+	}
+
+	if sf.debug {
+		log.Printf(`header read successfully`)
+	}
+
+	sf.initialized = true
+
+	return nil
 }
