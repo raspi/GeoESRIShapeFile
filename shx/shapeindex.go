@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-type ShapeFileIndex struct {
+type IndexRecordLookupFile struct {
 	r             common.ReadSeekCloser
 	debug         bool
 	initialized   bool
@@ -17,41 +17,41 @@ type ShapeFileIndex struct {
 }
 
 // Offsets for .shp file
-type ShapeOffsetIndex struct {
+type ShapeIndexRecord struct {
 	Offset uint32 // record offset
 	Length uint32 // record length
 }
 
-func (oi ShapeOffsetIndex) String() string {
+func (oi ShapeIndexRecord) String() string {
 	return fmt.Sprintf(`offset 0x%04[1]x (%06[1]d) with len 0x%04[2]x (%06[2]d)`, oi.Offset, oi.Length)
 }
 
-func New(fname string) (sfi ShapeFileIndex, err error) {
+func New(fname string) (sfi IndexRecordLookupFile, err error) {
 	f, err := common.OpenFile(fname)
 	if err != nil {
 		return sfi, err
 	}
 
-	return ShapeFileIndex{
+	return IndexRecordLookupFile{
 		r:           f,
 		debug:       false,
 		initialized: false,
 	}, nil
 }
 
-func (sfi *ShapeFileIndex) SetDebug(flag bool) {
+func (sfi *IndexRecordLookupFile) SetDebug(flag bool) {
 	sfi.debug = flag
 }
 
-func (sfi *ShapeFileIndex) GetDebug() bool {
+func (sfi *IndexRecordLookupFile) GetDebug() bool {
 	return sfi.debug
 }
 
-func (sfi *ShapeFileIndex) Close() error {
+func (sfi *IndexRecordLookupFile) Close() error {
 	return sfi.r.Close()
 }
 
-func (sfi *ShapeFileIndex) Initialize() (err error) {
+func (sfi *IndexRecordLookupFile) Initialize() (err error) {
 	err = common.ReadHeaders(sfi.r)
 	if err != nil {
 		return err
@@ -72,15 +72,15 @@ func (sfi *ShapeFileIndex) Initialize() (err error) {
 	return nil
 }
 
-func (sfi ShapeFileIndex) GetShapeFileSize() uint {
+func (sfi IndexRecordLookupFile) GetShapeFileSize() uint {
 	return sfi.totalFileSize
 }
 
-func (sfi ShapeFileIndex) GetRecordCount() uint {
+func (sfi IndexRecordLookupFile) GetRecordCount() uint {
 	return sfi.totalRecords
 }
 
-func (sfi *ShapeFileIndex) ReadRecord() (o ShapeOffsetIndex, err error) {
+func (sfi *IndexRecordLookupFile) ReadRecord() (o ShapeIndexRecord, err error) {
 	if !sfi.initialized {
 		return o, common.ErrorNotInitialized
 	}

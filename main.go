@@ -13,7 +13,7 @@ import (
 
 type ShapeFiles struct {
 	Fshp shp.ShapeFile
-	Fshx shx.ShapeFileIndex // lookups
+	Fshx shx.IndexRecordLookupFile // lookups
 	Fdbf dbf.DBaseFile
 
 	// logging
