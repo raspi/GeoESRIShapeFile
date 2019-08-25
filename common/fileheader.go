@@ -66,6 +66,7 @@ type ShapeFileHeader2 struct {
 	BBoxMMax  float64
 }
 
+//Read headers shared by .shp and .shx file
 func ReadHeaders(r ReadSeekCloser) error {
 	// Read primary header (notice endianness!)
 	var hdr1 ShapeFileHeader1
