@@ -23,7 +23,7 @@ func (db *DBaseFile) ReadRecord() (m map[string]Record, err error) {
 		return nil, common.ErrorNotInitialized
 	}
 
-	m = make(map[string]Record, len(db.FieldDescriptors))
+	m = make(map[string]Record, db.Header.FieldCount)
 
 	recordSizeLen := db.Header.RecordSize
 
