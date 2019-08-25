@@ -28,7 +28,7 @@ func (sf *ShapeFile) SetDebug(flag bool) {
 	sf.debug = flag
 }
 
-func (sf *ShapeFile) GetDebug() bool {
+func (sf ShapeFile) GetDebug() bool {
 	return sf.debug
 }
 
